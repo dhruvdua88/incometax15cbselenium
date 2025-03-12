@@ -6,6 +6,17 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import time
 from selenium.webdriver.support import expected_conditions as EC
+import tkinter as tk
+from tkinter import ttk
+from selenium.webdriver.common.by import By 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import tkinter as tk
+from tkinter import ttk
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 
 ##functions 
@@ -33,6 +44,56 @@ def click_with_retry(driver, xpath, max_attempts=10):
     print("❌ Element could not be clicked after multiple attempts.")
     return False  # All attempts failed
 
+
+def select_dropdown_value(driver, dropdown_xpath, option_xpath):
+    # Click the dropdown to open options
+    dropdown = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, dropdown_xpath)))
+    dropdown.click()
+
+    # Get all dropdown options
+    options = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.TAG_NAME, "mat-option")))
+    dropdown_values = [option.text for option in options]  # Extract text from each option
+
+    # GUI for user selection
+    def select_option():
+        selected_option = search_var.get()
+        root.destroy()  # Close the GUI
+
+        # Click the selected option in Selenium
+        selected_xpath = f"//mat-option/span[contains(text(), '{selected_option}')]"
+        option_element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, selected_xpath)))
+        option_element.click()
+        print(f"✅ Selected: {selected_option}")
+
+    # Live search function
+    def update_dropdown(*args):
+        search_text = search_var.get().lower()
+        filtered_values = [val for val in dropdown_values if search_text in val.lower()]
+        combo["values"] = filtered_values
+
+    # Tkinter GUI
+    root = tk.Tk()
+    root.title("Select an Option")
+    root.geometry("350x200")  # Set window size
+
+    label = tk.Label(root, text="Search & Select:")
+    label.pack(pady=5)
+
+    # Entry field for searching
+    search_var = tk.StringVar()
+    search_var.trace("w", update_dropdown)  # Update dropdown on typing
+    entry = tk.Entry(root, textvariable=search_var, width=30)
+    entry.pack(pady=5)
+
+    # Dropdown list
+    combo = ttk.Combobox(root, values=dropdown_values, state="readonly", width=27)
+    combo.pack(pady=5)
+    combo.current(0)  # Default to first option
+
+    button = tk.Button(root, text="OK", command=select_option)
+    button.pack(pady=10)
+
+    root.mainloop()
 
 
 
@@ -134,16 +195,10 @@ time.sleep(3)
 
 #################################### Enter basic 15CB information ###################################
 
-# Wait for the radio button to be clickable
-radio_button = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-select-form-details/div[3]/div[1]/form/mat-card/div[1]/div[2]/div/fieldset/mat-radio-group/mat-radio-button[1]/div/div/div[1]"))
-)
-
-# Click the radio button
-radio_button.click()
+element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-select-form-details/div[3]/div[1]/form/mat-card/div[1]/div[2]/div/fieldset/mat-radio-group/mat-radio-button[1]/div/label")))
+element.click()
 
 time.sleep(1)
-
 
 element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-select-form-details/div[3]/div[1]/form/mat-card/div[3]/div/div/mat-form-field/div[1]/div/div[2]/mat-select")))
 element.click(); WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//mat-option[span[contains(text(),'2024-25')]]"))).click()
@@ -160,19 +215,214 @@ element.click()
 
 time.sleep(1)
 
-
 element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[3]/div/div/div[2]/mat-form-field/div[1]/div/div[2]/input")))
 element.send_keys("AADCR0731R")
 
 time.sleep(1)
 
-
 element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[3]/div/div/div[3]/button")))
 element.click()
 
-#################################### Enter 15CB details  ###################################
+time.sleep(1)
 
 
+
+
+#################################### Enter 15CB details -CERTIFICATION ###################################
+
+
+##Click Certification 
+element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[2]/mat-accordion/div/mat-expansion-panel/mat-expansion-panel-header/span[1]/div/div")))
+element.click()
+
+time.sleep(1)  # Wait 1 second
+
+
+# Click the dropdown to open options
+dropdown = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[3]/mat-accordion/div/mat-expansion-panel/div/div/div[1]/div/iec-select[1]/div/mat-form-field/div[1]/div/div[2]/mat-select")))
+dropdown.click()
+
+# Select the option containing "We"
+option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//mat-option/span[contains(text(), 'We')]")))
+option.click()
+
+time.sleep(1)  # Wait 1 second
+
+
+import pyautogui
+import time
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('down')
+pyautogui.press('down')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('down')
+pyautogui.press('down')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("FORESCOUT")
+
+element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[3]/mat-accordion/div/div/div[2]/button")))
+element.click()
+
+time.sleep(1)  # Wait 1 second
+
+
+#################################### Enter 15CB details -RECIPIENT DETAILS ###################################
+element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[2]/mat-accordion/mat-expansion-panel[1]/mat-expansion-panel-header/span[1]")))
+element.click()
+
+time.sleep(1)  # Wait 1 second
+
+
+# DropDown
+
+# Click the dropdown to open options
+dropdown_xpath = "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[3]/mat-accordion/mat-expansion-panel[1]/div/div/div[3]/iec-address/div/div[1]/div/iec-select/div/div[2]/mat-form-field/div[1]/div/div[2]/mat-select"
+
+dropdown = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, dropdown_xpath)))
+dropdown.click()
+
+# Select "Angola"
+option_xpath = "//mat-option/span[contains(text(), 'United States Of America')]"
+option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, option_xpath)))
+option.click()
+
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("address1")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("address2")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("999999")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("Foreign")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("Foreign")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("Foreign")
+
+time.sleep(1)  # Wait 1 second
+
+# Click the button
+element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[3]/mat-accordion/div[2]/div[2]/button")))
+element.click()
+
+time.sleep(1)  # Wait 1 second
+
+#################################### Enter 15CB details -REMITTANCE  DETAILS ###################################
+
+##Click remittance details 
+
+
+
+
+# Click the dropdown to open options
+dropdown_xpath = "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[3]/mat-accordion/mat-expansion-panel[2]/div/div/div[1]/div[1]/iec-select/div/mat-form-field/div[1]/div/div[2]/mat-select"
+
+dropdown = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, dropdown_xpath)))
+dropdown.click()
+
+# Select "United States Of America"
+option_xpath = "//mat-option/span[contains(text(), 'United States Of America')]"
+option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, option_xpath)))
+option.click()
+
+time.sleep(1) 
+
+# Click the dropdown to open options
+dropdown_xpath = "/html/body/app-root/div[1]/div[4]/app-dashboard/app-file-income-tax-forms/app-form15cb/div[2]/div[2]/div[3]/mat-accordion/mat-expansion-panel[2]/div/div/div[2]/iec-select/div/mat-form-field/div[1]/div/div[2]/mat-select"
+
+dropdown = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, dropdown_xpath)))
+dropdown.click()
+
+# Select "USD"
+option_xpath = "//mat-option/span[contains(text(), 'USD')]"
+option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, option_xpath)))
+option.click()
+
+time.sleep(1) 
+
+
+import pyautogui
+import time
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("100")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("1000")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("CITI0000002")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+time.sleep(1)  # Wait 1 second
+pyautogui.write("9999999")
+
+time.sleep(1)  # Wait 1 second
+pyautogui.press('tab')
+
+
+
+
+
+
+
+
+
+
+#################################### Logout  ###################################
+
+#element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[2]/div/div/div/div/button[3]/span/span")))
+#element.click()
 
 
 
